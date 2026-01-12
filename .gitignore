@@ -44,8 +44,9 @@ yarn-error.*
 *.tmp
 *.temp
 
-# API Keys (if using separate config)
-# src/config/apiConfig.js (uncomment if you want to ignore this file)
+# API Keys and Secrets
+# Note: We keep the config files in git with placeholders, but actual keys should never be committed
+# If you add real keys, create a local .env file or use environment variables
 
 # Build files
 *.apk
