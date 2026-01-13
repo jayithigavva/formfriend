@@ -1,23 +1,22 @@
-import { OPENAI_API_KEY, GEMINI_API_KEY } from '../config/apiConfig';
-import { sendGeminiChatMessage } from './geminiChatService';
+import { OPENAI_API_KEY } from '../config/apiConfig';
 
 // Get system prompt based on option and form type
 const getSystemPrompt = (option, formType, context, language) => {
   const optionNames = {
-    passport: 'passport application',
-    drivingLicense: 'driving license',
-    aadhar: 'Aadhar card',
-    pan: 'PAN card',
-    birthCertificate: 'birth certificate',
-    marriageCertificate: 'marriage certificate',
-    rationCard: 'ration card',
-    voterId: 'Voter ID',
-    bankAccount: 'bank account',
-    insurance: 'insurance',
-    others: 'general form',
+    pmJanDhan: 'Pradhan Mantri Jan Dhan Yojana',
+    pmAwas: 'Pradhan Mantri Awas Yojana',
+    ayushmanBharat: 'Ayushman Bharat – PM Jan Arogya Yojana',
+    mgnrega: 'Mahatma Gandhi National Rural Employment Guarantee Act (MGNREGA)',
+    pmUjjwala: 'Pradhan Mantri Ujjwala Yojana',
+    betiBachao: 'Beti Bachao Beti Padhao',
+    pmKisan: 'Pradhan Mantri Kisan Samman Nidhi (PM-KISAN)',
+    nfsa: 'National Food Security Act (NFSA)',
+    swachhBharat: 'Swachh Bharat Mission',
+    pmMudra: 'Pradhan Mantri Mudra Yojana',
+    others: 'general government scheme',
   };
 
-  const optionName = optionNames[option] || 'general form';
+  const optionName = optionNames[option] || 'general government scheme';
   const mode = formType === 'offline' ? 'offline' : 'online';
   
   const languageInstruction = language === 'hindi' 
@@ -30,7 +29,7 @@ const getSystemPrompt = (option, formType, context, language) => {
     ? 'Respond in Kannada (ಕನ್ನಡ).'
     : 'Respond in English.';
 
-  return `You are a helpful assistant for form filling in India. The user is asking about ${optionName} form filling in ${mode} mode. 
+  return `You are a helpful assistant for government scheme applications in India. The user is asking about ${optionName} scheme application in ${mode} mode. 
 
 ${languageInstruction}
 
@@ -46,14 +45,13 @@ Keep responses practical and easy to understand.`;
 };
 
 /**
- * Send a chat message using AI (prefers Gemini, falls back to OpenAI)
+ * Send a chat message using OpenAI ChatGPT API
  * @param {string} userMessage - The user's message
  * @param {string} option - The selected scheme option
  * @param {string} formType - 'online' or 'offline'
  * @param {string} context - Additional context
  * @param {string} language - Selected language
  * @param {Array} previousMessages - Previous conversation messages
- * @param {string} provider - 'gemini' or 'openai' (defaults to 'gemini' if available)
  * @returns {Promise<string>} - The AI's response
  */
 export const sendChatMessage = async (
@@ -62,29 +60,10 @@ export const sendChatMessage = async (
   formType,
   context,
   language,
-  previousMessages = [],
-  provider = 'auto'
+  previousMessages = []
 ) => {
-  // Auto-detect provider: prefer Gemini if available, otherwise use OpenAI
-  const useProvider = provider === 'auto' 
-    ? (GEMINI_API_KEY && GEMINI_API_KEY !== 'YOUR_GEMINI_API_KEY_HERE' ? 'gemini' : 'openai')
-    : provider;
-
-  // Use Gemini API if selected and available
-  if (useProvider === 'gemini') {
-    return sendGeminiChatMessage(
-      userMessage,
-      option,
-      formType,
-      context,
-      language,
-      previousMessages
-    );
-  }
-
-  // Fall back to OpenAI
   if (!OPENAI_API_KEY || OPENAI_API_KEY === 'YOUR_API_KEY_HERE') {
-    throw new Error('Neither Gemini nor OpenAI API key is configured. Please set GEMINI_API_KEY or OPENAI_API_KEY in src/config/apiConfig.js');
+    throw new Error('OpenAI API key is not configured. Please set OPENAI_API_KEY in src/config/apiConfig.js');
   }
 
   const systemPrompt = getSystemPrompt(option, formType, context, language);

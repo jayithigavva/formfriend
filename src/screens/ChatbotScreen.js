@@ -185,9 +185,10 @@ export default function ChatbotScreen({ route }) {
       }
     } catch (error) {
       console.error('Chat error:', error);
+      console.error('Error details:', error.message);
       const errorMessage = {
         id: Date.now() + 1,
-        text: 'Sorry, I encountered an error. Please try again or check your API key configuration.',
+        text: error.message || 'Sorry, I encountered an error. Please try again or check your API key configuration.',
         isUser: false,
       };
       setMessages(prev => [...prev, errorMessage]);
